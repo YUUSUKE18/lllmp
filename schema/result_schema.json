@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "dyntest result (1 テストケース実行)",
+  "description": "全言語共通の出力契約。run.sh が 1 ケース実行ごとに 1 オブジェクトを出力する。",
+  "type": "object",
+  "required": ["label", "build_ok"],
+  "properties": {
+    "label": { "type": "string", "description": "テストケース識別子" },
+    "build_ok": { "type": "boolean", "description": "ビルド/型検査が通ったか（func 判定の前提）" },
+    "build_err_b64": { "type": "string", "description": "build_ok=false 時のビルドエラー（base64）" },
+    "measure": {
+      "type": "object",
+      "description": "measure.sh によるプロセス外計測（build_ok=true 時のみ）",
+      "required": ["exit_code", "timed_out", "oom_killed", "wall_s", "peak_rss_kb"],
+      "properties": {
+        "label": { "type": "string" },
+        "timeout_s": { "type": "number", "description": "適用した実行時間上限（秒）" },
+        "exit_code": { "type": "integer", "description": "対象プロセスの終了コード" },
+        "timed_out": { "type": "boolean", "description": "timeout により中断されたか（exit 124）" },
+        "oom_killed": { "type": "boolean", "description": "SIGKILL で殺されたか（exit 137, OOM 等）" },
+        "wall_s": { "type": "number", "description": "実時間（秒, /usr/bin/time -v）" },
+        "peak_rss_kb": { "type": "integer", "description": "最大 RSS（KB, /usr/bin/time -v）" },
+        "stdout_b64": { "type": "string", "description": "対象プロセスの標準出力（base64）。func の出力一致判定に使う" },
+        "stderr_b64": { "type": "string", "description": "対象プロセスの標準エラー（base64）" }
+      }
+    }
+  }
+}
