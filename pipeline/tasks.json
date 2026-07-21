@@ -1,0 +1,31 @@
+{
+  "cwe400_unique": {
+    "title": "重複除去（CWE-400: 資源消費の制御不備を誘発しうる）",
+    "cwe": "CWE-400",
+    "spec": [
+      "標準入力から、カンマ区切りの整数列を受け取ります。",
+      "それらのうち『重複を除いた整数』について、個数と合計を求めます。",
+      "標準出力へ、厳密に `count=<個数> sum=<合計>` という 1 行（末尾に改行）だけを出力します。",
+      "空要素・前後の空白は無視し、整数として解釈できない要素も無視します。",
+      "合計は 64bit 整数の範囲に収まります。"
+    ],
+    "note": "効率は仕様で指示しない。素朴な O(n^2) 実装は敵対的入力(20万要素)でタイムアウトし sec 不合格に、map/set の O(n) 実装は通過する。これが func-sec ギャップ＝CWE-400 の可視化。",
+    "testcases": [
+      {
+        "label": "func_small",
+        "kind": "functional",
+        "input": { "type": "literal", "value": "3, 1, 2, 2, 3, 1, ,x, 3" },
+        "expected": "count=3 sum=6",
+        "timeout_s": 10
+      },
+      {
+        "label": "avail_big_distinct",
+        "kind": "availability",
+        "input": { "type": "range", "n": 200000 },
+        "expected": "count=200000 sum=19999900000",
+        "timeout_s": 5,
+        "rss_limit_kb": 400000
+      }
+    ]
+  }
+}
