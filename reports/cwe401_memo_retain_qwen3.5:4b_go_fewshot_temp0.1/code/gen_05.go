@@ -1,0 +1,52 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strconv"
+)
+
+func main() {
+	sc := bufio.NewScanner(os.Stdin)
+	cache := make(map[int64]int)
+	total := 0
+
+	for sc.Scan() {
+		line := sc.Text()
+		if line == "" {
+			continue
+		}
+
+		n, err := strconv.ParseInt(line, 10, 64)
+		if err != nil {
+			continue
+		}
+
+		if n == 1 {
+			total += cache[1]
+			continue
+		}
+
+		if val, ok := cache[n]; ok {
+			total += val
+			continue
+		}
+
+		steps := 0
+		curr := n
+		for curr != 1 {
+			if curr%2 == 0 {
+				curr = curr / 2
+			} else {
+				curr = 3*curr + 1
+			}
+			steps++
+		}
+
+		cache[n] = steps
+		total += steps
+	}
+
+	fmt.Printf("total=%d\n", total)
+}

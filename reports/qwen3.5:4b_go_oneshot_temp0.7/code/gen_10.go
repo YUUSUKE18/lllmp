@@ -1,0 +1,35 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+)
+
+func main() {
+	sc := bufio.NewScanner(os.Stdin)
+	sc.Scan()
+	input := sc.Text()
+	parts := strings.Split(input, ",")
+
+	counts := make(map[int]int)
+	sum := int64(0)
+
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		if part == "" {
+			continue
+		}
+		n, err := strconv.Atoi(part)
+		if err != nil {
+			continue
+		}
+		counts[n]++
+		sum += int64(n)
+	}
+
+	total := len(counts)
+	fmt.Printf("count=%d sum=%d\n", total, sum)
+}
