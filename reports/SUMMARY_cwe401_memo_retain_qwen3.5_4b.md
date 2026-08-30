@@ -7,6 +7,8 @@
 - **閾値の根拠**: `docs/cwe401_calibration.md`
 - **各条件 k=10**、36条件360世代。取得日 2026-08-28〜29、`docker_err` 0件。
 - 同一タスクの gemma4:e2b 版は `reports/SUMMARY_cwe401_memo_retain.md`。
+- **比較可能性**: gemma4:e2b 版(08-27)・本データ(08-28〜29)とも判定コード編集(08-26)より後の取得で、
+  同一の判定関数で採点されている。同様の照合手段は `pipeline/rejudge.py`。
 
 ## 結論
 

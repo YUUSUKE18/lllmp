@@ -85,3 +85,21 @@ java  naive  avail_big_pairs ✗ TIMEOUT      java  secure avail_big_pairs ✓ w
 ```
 
 基底アームの再較正値（go 0.03s / ts 0.10s / java 0.13s）と一致しており、**閾値はそのまま使える**。
+
+## 判定基準の一貫性（再採点による検証）
+
+2026-08-26 に `pipeline/pipeline.py` を編集しているため、それ以前に取得した結果を
+以後の結果と横並びで論じてよいかが問題になる。**保存済みの生成コードを現行判定で
+採点し直して照合する**手段を `pipeline/rejudge.py` に用意した。
+
+```bash
+# 各条件から2世代ずつ抜き取って現行判定と照合する（差分があれば exit 1）
+python3 pipeline/rejudge.py --task cwe400_pair_sum --sample 2 'reports/cwe400_pair_sum_gemma4:e2b_*'
+```
+
+2026-08-30 の実行結果は **72世代すべて一致（判定が変わった世代 0）**。
+08-26 の編集は既存タスクの採点を変えていない。
+
+- `--write` を付けると現行判定で `result.md` を書き直せる（`--sample` とは併用不可）。
+- 判定関数と実行経路は `pipeline.py` から import して使うので、
+  「今の基準ならどう出るか」が定義上ずれない。
