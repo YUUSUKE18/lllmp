@@ -1,0 +1,45 @@
+{
+  "_note": "例示の資源安全性を独立変数にするための safe アーム。3課題とも入力をバイト単位で逐次パースし、入力全体をメモリに保持しない（定数メモリ）。unsafe アーム(shots_unsafe.json)と課題・出力契約は同一で、読み込み戦略だけが違う。本タスクの解答はリークしない。",
+  "go": [
+    {
+      "problem": "空白区切りの整数列を読み、最大値を `max=<最大>` の1行で出力する。",
+      "code": "package main\n\nimport (\n\t\"bufio\"\n\t\"fmt\"\n\t\"os\"\n)\n\nfunc main() {\n\tr := bufio.NewReaderSize(os.Stdin, 64*1024)\n\tmax, cur := 0, 0\n\thas, first := false, true\n\tflush := func() {\n\t\tif !has {\n\t\t\treturn\n\t\t}\n\t\tif first || cur > max {\n\t\t\tmax = cur\n\t\t\tfirst = false\n\t\t}\n\t\tcur, has = 0, false\n\t}\n\tfor {\n\t\tb, err := r.ReadByte()\n\t\tif err != nil {\n\t\t\tbreak\n\t\t}\n\t\tif b >= '0' && b <= '9' {\n\t\t\tcur = cur*10 + int(b-'0')\n\t\t\thas = true\n\t\t} else {\n\t\t\tflush()\n\t\t}\n\t}\n\tflush()\n\tfmt.Printf(\"max=%d\\n\", max)\n}\n"
+    },
+    {
+      "problem": "カンマ区切りの語を読み、空でない語の数を `words=<個数>` の1行で出力する。",
+      "code": "package main\n\nimport (\n\t\"bufio\"\n\t\"fmt\"\n\t\"os\"\n)\n\nfunc main() {\n\tr := bufio.NewReaderSize(os.Stdin, 64*1024)\n\tc, nonSpace := 0, false\n\tfor {\n\t\tb, err := r.ReadByte()\n\t\tif err != nil {\n\t\t\tbreak\n\t\t}\n\t\tif b == ',' {\n\t\t\tif nonSpace {\n\t\t\t\tc++\n\t\t\t}\n\t\t\tnonSpace = false\n\t\t} else if b != ' ' && b != '\\t' && b != '\\n' && b != '\\r' {\n\t\t\tnonSpace = true\n\t\t}\n\t}\n\tif nonSpace {\n\t\tc++\n\t}\n\tfmt.Printf(\"words=%d\\n\", c)\n}\n"
+    },
+    {
+      "problem": "標準入力全体を読み、行数と文字数を `lines=<行数> chars=<文字数>` の1行で出力する。",
+      "code": "package main\n\nimport (\n\t\"bufio\"\n\t\"fmt\"\n\t\"os\"\n)\n\nfunc main() {\n\tr := bufio.NewReaderSize(os.Stdin, 64*1024)\n\tbuf := make([]byte, 64*1024)\n\tlines, chars := 0, 0\n\tfor {\n\t\tn, err := r.Read(buf)\n\t\tfor i := 0; i < n; i++ {\n\t\t\tchars++\n\t\t\tif buf[i] == '\\n' {\n\t\t\t\tlines++\n\t\t\t}\n\t\t}\n\t\tif err != nil {\n\t\t\tbreak\n\t\t}\n\t}\n\tfmt.Printf(\"lines=%d chars=%d\\n\", lines, chars)\n}\n"
+    }
+  ],
+  "ts": [
+    {
+      "problem": "空白区切りの整数列を読み、最大値を `max=<最大>` の1行で出力する。",
+      "code": "import * as fs from \"fs\";\n\nconst buf = Buffer.alloc(64 * 1024);\nlet max = 0, cur = 0, has = false, first = true;\nfunction flush(): void {\n  if (!has) return;\n  if (first || cur > max) { max = cur; first = false; }\n  cur = 0; has = false;\n}\nfor (;;) {\n  let n = 0;\n  try { n = fs.readSync(0, buf, 0, buf.length, null); } catch { break; }\n  if (n <= 0) break;\n  for (let i = 0; i < n; i++) {\n    const b = buf[i];\n    if (b >= 48 && b <= 57) { cur = cur * 10 + (b - 48); has = true; }\n    else flush();\n  }\n}\nflush();\nprocess.stdout.write(`max=${max}\\n`);\n"
+    },
+    {
+      "problem": "カンマ区切りの語を読み、空でない語の数を `words=<個数>` の1行で出力する。",
+      "code": "import * as fs from \"fs\";\n\nconst buf = Buffer.alloc(64 * 1024);\nlet c = 0, nonSpace = false;\nfor (;;) {\n  let n = 0;\n  try { n = fs.readSync(0, buf, 0, buf.length, null); } catch { break; }\n  if (n <= 0) break;\n  for (let i = 0; i < n; i++) {\n    const b = buf[i];\n    if (b === 44) { if (nonSpace) c++; nonSpace = false; }\n    else if (b !== 32 && b !== 9 && b !== 10 && b !== 13) nonSpace = true;\n  }\n}\nif (nonSpace) c++;\nprocess.stdout.write(`words=${c}\\n`);\n"
+    },
+    {
+      "problem": "標準入力全体を読み、行数と文字数を `lines=<行数> chars=<文字数>` の1行で出力する。",
+      "code": "import * as fs from \"fs\";\n\nconst buf = Buffer.alloc(64 * 1024);\nlet lines = 0, chars = 0;\nfor (;;) {\n  let n = 0;\n  try { n = fs.readSync(0, buf, 0, buf.length, null); } catch { break; }\n  if (n <= 0) break;\n  for (let i = 0; i < n; i++) {\n    chars++;\n    if (buf[i] === 10) lines++;\n  }\n}\nprocess.stdout.write(`lines=${lines} chars=${chars}\\n`);\n"
+    }
+  ],
+  "java": [
+    {
+      "problem": "空白区切りの整数列を読み、最大値を `max=<最大>` の1行で出力する。",
+      "code": "import java.io.BufferedInputStream;\n\npublic class Main {\n    public static void main(String[] args) throws Exception {\n        BufferedInputStream in = new BufferedInputStream(System.in, 1 << 16);\n        byte[] buf = new byte[1 << 16];\n        long max = 0, cur = 0;\n        boolean has = false, first = true;\n        int n;\n        while ((n = in.read(buf)) > 0) {\n            for (int i = 0; i < n; i++) {\n                int b = buf[i] & 0xff;\n                if (b >= '0' && b <= '9') {\n                    cur = cur * 10 + (b - '0');\n                    has = true;\n                } else if (has) {\n                    if (first || cur > max) { max = cur; first = false; }\n                    cur = 0; has = false;\n                }\n            }\n        }\n        if (has && (first || cur > max)) max = cur;\n        System.out.println(\"max=\" + max);\n    }\n}\n"
+    },
+    {
+      "problem": "カンマ区切りの語を読み、空でない語の数を `words=<個数>` の1行で出力する。",
+      "code": "import java.io.BufferedInputStream;\n\npublic class Main {\n    public static void main(String[] args) throws Exception {\n        BufferedInputStream in = new BufferedInputStream(System.in, 1 << 16);\n        byte[] buf = new byte[1 << 16];\n        int c = 0, n;\n        boolean nonSpace = false;\n        while ((n = in.read(buf)) > 0) {\n            for (int i = 0; i < n; i++) {\n                int b = buf[i] & 0xff;\n                if (b == ',') {\n                    if (nonSpace) c++;\n                    nonSpace = false;\n                } else if (b != ' ' && b != '\\t' && b != '\\n' && b != '\\r') {\n                    nonSpace = true;\n                }\n            }\n        }\n        if (nonSpace) c++;\n        System.out.println(\"words=\" + c);\n    }\n}\n"
+    },
+    {
+      "problem": "標準入力全体を読み、行数と文字数を `lines=<行数> chars=<文字数>` の1行で出力する。",
+      "code": "import java.io.BufferedInputStream;\n\npublic class Main {\n    public static void main(String[] args) throws Exception {\n        BufferedInputStream in = new BufferedInputStream(System.in, 1 << 16);\n        byte[] buf = new byte[1 << 16];\n        long lines = 0, chars = 0;\n        int n;\n        while ((n = in.read(buf)) > 0) {\n            for (int i = 0; i < n; i++) {\n                chars++;\n                if (buf[i] == '\\n') lines++;\n            }\n        }\n        System.out.println(\"lines=\" + lines + \" chars=\" + chars);\n    }\n}\n"
+    }
+  ]
+}

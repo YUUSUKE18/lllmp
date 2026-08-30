@@ -1,0 +1,45 @@
+{
+  "_note": "few-shot 用の例示。各言語で『標準入力を読み、厳密に1行だけ出力する』別タスクの完成コード。本タスク(重複除去)の解答はリークしない（最大値/語数/行数など別問題）。one-shot=先頭1件、few-shot=全件。",
+  "go": [
+    {
+      "problem": "空白区切りの整数列を読み、最大値を `max=<最大>` の1行で出力する。",
+      "code": "package main\n\nimport (\n\t\"bufio\"\n\t\"fmt\"\n\t\"os\"\n\t\"strconv\"\n\t\"strings\"\n)\n\nfunc main() {\n\tsc := bufio.NewScanner(os.Stdin)\n\tsc.Scan()\n\tmax := 0\n\tfirst := true\n\tfor _, f := range strings.Fields(sc.Text()) {\n\t\tn, err := strconv.Atoi(f)\n\t\tif err != nil {\n\t\t\tcontinue\n\t\t}\n\t\tif first || n > max {\n\t\t\tmax = n\n\t\t\tfirst = false\n\t\t}\n\t}\n\tfmt.Printf(\"max=%d\\n\", max)\n}\n"
+    },
+    {
+      "problem": "カンマ区切りの語を読み、空でない語の数を `words=<個数>` の1行で出力する。",
+      "code": "package main\n\nimport (\n\t\"bufio\"\n\t\"fmt\"\n\t\"os\"\n\t\"strings\"\n)\n\nfunc main() {\n\tsc := bufio.NewScanner(os.Stdin)\n\tsc.Scan()\n\tc := 0\n\tfor _, w := range strings.Split(sc.Text(), \",\") {\n\t\tif strings.TrimSpace(w) != \"\" {\n\t\t\tc++\n\t\t}\n\t}\n\tfmt.Printf(\"words=%d\\n\", c)\n}\n"
+    },
+    {
+      "problem": "標準入力全体を読み、行数と文字数を `lines=<行数> chars=<文字数>` の1行で出力する。",
+      "code": "package main\n\nimport (\n\t\"bufio\"\n\t\"fmt\"\n\t\"os\"\n)\n\nfunc main() {\n\tr := bufio.NewReader(os.Stdin)\n\tbuf := make([]byte, 64*1024)\n\tlines, chars := 0, 0\n\tfor {\n\t\tn, err := r.Read(buf)\n\t\tfor i := 0; i < n; i++ {\n\t\t\tchars++\n\t\t\tif buf[i] == '\\n' {\n\t\t\t\tlines++\n\t\t\t}\n\t\t}\n\t\tif err != nil {\n\t\t\tbreak\n\t\t}\n\t}\n\tfmt.Printf(\"lines=%d chars=%d\\n\", lines, chars)\n}\n"
+    }
+  ],
+  "ts": [
+    {
+      "problem": "空白区切りの整数列を読み、最大値を `max=<最大>` の1行で出力する。",
+      "code": "const data: Buffer[] = [];\nprocess.stdin.on(\"data\", (c: Buffer) => data.push(c));\nprocess.stdin.on(\"end\", () => {\n  const s = Buffer.concat(data).toString(\"utf8\");\n  let max = 0, first = true;\n  for (const f of s.split(/\\s+/)) {\n    if (f.trim() === \"\") continue;\n    const n = parseInt(f, 10);\n    if (Number.isNaN(n)) continue;\n    if (first || n > max) { max = n; first = false; }\n  }\n  console.log(`max=${max}`);\n});\n"
+    },
+    {
+      "problem": "カンマ区切りの語を読み、空でない語の数を `words=<個数>` の1行で出力する。",
+      "code": "const data: Buffer[] = [];\nprocess.stdin.on(\"data\", (c: Buffer) => data.push(c));\nprocess.stdin.on(\"end\", () => {\n  const s = Buffer.concat(data).toString(\"utf8\");\n  let c = 0;\n  for (const w of s.split(\",\")) if (w.trim() !== \"\") c++;\n  console.log(`words=${c}`);\n});\n"
+    },
+    {
+      "problem": "標準入力全体を読み、行数と文字数を `lines=<行数> chars=<文字数>` の1行で出力する。",
+      "code": "const data: Buffer[] = [];\nprocess.stdin.on(\"data\", (c: Buffer) => data.push(c));\nprocess.stdin.on(\"end\", () => {\n  const s = Buffer.concat(data).toString(\"utf8\");\n  let lines = 0;\n  for (const ch of s) if (ch === \"\\n\") lines++;\n  console.log(`lines=${lines} chars=${s.length}`);\n});\n"
+    }
+  ],
+  "java": [
+    {
+      "problem": "空白区切りの整数列を読み、最大値を `max=<最大>` の1行で出力する。",
+      "code": "import java.io.BufferedReader;\nimport java.io.InputStreamReader;\n\npublic class Main {\n    public static void main(String[] args) throws Exception {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String line = br.readLine();\n        int max = 0;\n        boolean first = true;\n        if (line != null) {\n            for (String f : line.trim().split(\"\\\\s+\")) {\n                if (f.isEmpty()) continue;\n                try {\n                    int n = Integer.parseInt(f);\n                    if (first || n > max) { max = n; first = false; }\n                } catch (NumberFormatException e) {\n                }\n            }\n        }\n        System.out.println(\"max=\" + max);\n    }\n}\n"
+    },
+    {
+      "problem": "カンマ区切りの語を読み、空でない語の数を `words=<個数>` の1行で出力する。",
+      "code": "import java.io.BufferedReader;\nimport java.io.InputStreamReader;\n\npublic class Main {\n    public static void main(String[] args) throws Exception {\n        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));\n        String line = br.readLine();\n        int c = 0;\n        if (line != null) {\n            for (String w : line.split(\",\")) {\n                if (!w.trim().isEmpty()) c++;\n            }\n        }\n        System.out.println(\"words=\" + c);\n    }\n}\n"
+    },
+    {
+      "problem": "標準入力全体を読み、行数と文字数を `lines=<行数> chars=<文字数>` の1行で出力する。",
+      "code": "import java.io.InputStreamReader;\nimport java.io.Reader;\n\npublic class Main {\n    public static void main(String[] args) throws Exception {\n        Reader r = new InputStreamReader(System.in);\n        int ch, lines = 0, chars = 0;\n        while ((ch = r.read()) != -1) {\n            chars++;\n            if (ch == '\\n') lines++;\n        }\n        System.out.println(\"lines=\" + lines + \" chars=\" + chars);\n    }\n}\n"
+    }
+  ]
+}
