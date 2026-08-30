@@ -1,0 +1,19 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.regex.Pattern;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int valid = 0;
+        Pattern pattern = Pattern.compile("^[ \\t]*\\b(-?[0-9]+)(,[ -\\t]*\\b(-?[0-9]+))*[,\\s]*$");
+
+        String line;
+        while ((line = br.readLine()) != null) {
+            if (pattern.matcher(line).matches()) {
+                valid++;
+            }
+        }
+        System.out.println("valid=" + valid);
+    }
+}

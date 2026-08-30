@@ -1,0 +1,47 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.StringTokenizer;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int validCount = 0;
+        String line;
+        
+        while ((line = br.readLine()) != null) {
+            // 前後の空白を除去して処理対象とする
+            String trimmedLine = line.trim();
+            
+            // 空行は妥当ではない
+            if (trimmedLine.isEmpty()) {
+                continue;
+            }
+            
+            // 文字列をカンマで分割し、トークン化
+            StringTokenizer st = new StringTokenizer(trimmedLine, ",");
+            boolean isValid = true;
+            
+            // トークンが少なくとも 1 つあるか確認
+            if (!st.hasMoreTokens()) {
+                isValid = false;
+            } else {
+                // 各トークンを整数として解析し、数字以外が含まれていないか確認
+                while (st.hasMoreTokens()) {
+                    String token = st.nextToken();
+                    try {
+                        Integer.parseInt(token);
+                    } catch (NumberFormatException e) {
+                        isValid = false;
+                        break;
+                    }
+                }
+            }
+            
+            if (isValid) {
+                validCount++;
+            }
+        }
+        
+        System.out.println("valid=" + validCount);
+    }
+}
