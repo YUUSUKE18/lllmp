@@ -5,6 +5,8 @@
 - **閾値の根拠**: `docs/cwe770_rle_calibration.md`（参照実装では3言語すべてで naive が OOM/異常終了）。
 - **各条件 k=10**、zero/one/few-shot × go/ts/java × 温度 {0.1, 0.4, 0.7, 1.0} の36条件360世代。
 - 取得日 2026-08-20、`docker_err` 0件。
+- **qwen3.5:4b 版は `reports/SUMMARY_cwe770_rle_qwen3.5_4b.md`。** あちらではギャップが3件出たが、
+  いずれも配列展開による OOM ではなく「展開しないが回数だけ信じて回す」中間形の TIMEOUT だった。
 
 ## 結論
 
