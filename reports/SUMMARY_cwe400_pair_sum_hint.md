@@ -8,6 +8,8 @@
   （`docs/cwe400_pair_sum_calibration.md`）。
 - **各アーム36条件360世代**（zero/one/few-shot × go/ts/java × 温度 {0.1, 0.4, 0.7, 1.0}、k=10）。
 - 取得日: 基底 2026-08-20 / ヒント 2026-08-29、`docker_err` 両アームとも 0件。
+- **qwen3.5:4b 版は `reports/SUMMARY_hint_arms_qwen3.5_4b.md`。** あちらでは func の悪化が起きず、
+  ギャップ率が 48.8% → 32.5% (p=0.013) と有意に下がった。**目標を述べる介入の効果はモデル依存である。**
 - **取得時期をまたぐことの妥当性を検証済み**: 基底アームは判定コード編集(08-26)より前の取得だが、
   保存済みコードを現行判定で採点し直したところ **72世代すべてで当時と一致**した
   （`python3 pipeline/rejudge.py --task cwe400_pair_sum --sample 2 'reports/cwe400_pair_sum_gemma4:e2b_*'`）。

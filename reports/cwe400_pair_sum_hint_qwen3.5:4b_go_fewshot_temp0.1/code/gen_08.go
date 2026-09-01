@@ -1,0 +1,42 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+)
+
+func main() {
+	sc := bufio.NewScanner(os.Stdin)
+	var target int64
+	if !sc.Scan() {
+		return
+	}
+	fmt.Sscanf(sc.Text(), "%d", &target)
+
+	var nums []int64
+	for sc.Scan() {
+		line := sc.Text()
+		if line == "" {
+			continue
+		}
+		var n int64
+		fmt.Sscanf(line, "%d", &n)
+		if err := sc.Err(); err != nil {
+			break
+		}
+		nums = append(nums, n)
+	}
+
+	count := 0
+	n := len(nums)
+	for i := 0; i < n; i++ {
+		for j := i + 1; j < n; j++ {
+			if nums[i]+nums[j] == target {
+				count++
+			}
+		}
+	}
+
+	fmt.Printf("pairs=%d\n", count)
+}
