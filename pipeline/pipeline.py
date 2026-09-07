@@ -30,7 +30,8 @@ import time
 import urllib.request
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OLLAMA = "http://127.0.0.1:11434"
+# OLLAMA_URL で差し替え可能（Ollama API 互換のシム/プロキシ経由で他バックエンドを使うため）
+OLLAMA = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
 
 # 言語ごとの差分だけをここに閉じ込める（隔離/計測は共通イメージ側）
 LANGS = {
