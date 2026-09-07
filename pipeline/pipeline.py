@@ -35,22 +35,11 @@ OLLAMA = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
 
 # 言語ごとの差分だけをここに閉じ込める（隔離/計測は共通イメージ側）
 LANGS = {
-    "go": {
-        "filename": "main.go",
-        "image": "dyntest-go",
-        "hint": "完全な Go プログラム。`package main` と `func main` を含み、標準ライブラリのみを使う。",
-    },
-    "ts": {
-        "filename": "main.ts",
-        "image": "dyntest-ts",
-        "hint": "Node.js で動く完全な TypeScript。`process.stdin` から入力を読む。外部パッケージは使わない。",
-    },
-    "java": {
-        "filename": "Main.java",
-        "image": "dyntest-java",
-        "hint": "`public class Main` を含む完全な Java プログラム。標準ライブラリのみを使う。",
-    },
+    "go": {"filename": "main.go", "image": "dyntest-go"},
+    "ts": {"filename": "main.ts", "image": "dyntest-ts"},
+    "java": {"filename": "Main.java", "image": "dyntest-java"},
 }
+# モデルへ送る文言（言語ヒントを含む）は pipeline/prompts.json 側で管理する。
 
 # 共通の隔離フラグ（README / run_demo.sh と同一）
 ISOLATION = [
@@ -134,6 +123,36 @@ def ensure_model(model):
 DEFAULT_SHOTS_FILE = "shots.json"
 _SHOTS = {}
 
+# プロンプトの文言は pipeline/prompts.json で管理する（コードは組み立てのみ）。
+# セット名を変えることで「同じタスクにプロンプトだけ別アームを当てる」ことができる。
+DEFAULT_PROMPTS_FILE = "prompts.json"
+DEFAULT_PROMPT_SET = "default"
+_PROMPTS = {}
+
+
+def load_prompt_set(name=DEFAULT_PROMPT_SET, prompts_file=DEFAULT_PROMPTS_FILE):
+    """prompts.json から 1 セットを読む。`extends` は指定セットで上書きする浅いマージ。"""
+    path = os.path.join(REPO, "pipeline", prompts_file)
+    if path not in _PROMPTS:
+        _PROMPTS[path] = json.load(open(path))
+    doc = _PROMPTS[path]
+    if name not in doc or name.startswith("_"):
+        sys.exit(f"未知のプロンプトセット: {name}"
+                 f"（候補: {', '.join(k for k in doc if not k.startswith('_'))}）")
+    entry = doc[name]
+    base = doc[entry["extends"]] if "extends" in entry else {}
+    merged = dict(base)
+    merged.update({k: v for k, v in entry.items() if k not in ("extends", "description")})
+    return merged
+
+
+def fill(template, **kw):
+    """{name} を素朴に置換する。仕様文や生成コードに波括弧が現れても壊れないよう
+    str.format は使わない（置換対象は既知のプレースホルダだけ）。"""
+    for k, v in kw.items():
+        template = template.replace("{" + k + "}", str(v))
+    return template
+
 
 def shots_path(name):
     """例示セット名/パスを絶対パスへ。`shots_safe` のような素の名前も受ける。"""
@@ -153,26 +172,31 @@ def load_shots(lang, shots_file=DEFAULT_SHOTS_FILE):
     return _SHOTS[p].get(lang, [])
 
 
-def build_prompt(task, lang, n_shots=0, shots_file=DEFAULT_SHOTS_FILE):
+def build_prompt(task, lang, n_shots=0, shots_file=DEFAULT_SHOTS_FILE,
+                 prompt_set=DEFAULT_PROMPT_SET):
     """n_shots=0 は zero-shot（仕様のみ）、1 は one-shot、>=2 は few-shot。
-    例示は本タスクとは別問題の完成コードで、解答をリークしない。"""
-    spec = "\n".join(f"- {s}" for s in task["spec"])
-    head = "あなたはコード生成器です。仕様を満たすプログラムを 1 つだけ書いてください。\n\n"
+    例示は本タスクとは別問題の完成コードで、解答をリークしない。
+    文言は prompts.json 側にあり、ここは組み立てだけを行う。"""
+    P = load_prompt_set(prompt_set)
 
     shot_block = ""
     if n_shots > 0:
+        sh = P["shots"]
         shots = load_shots(lang, shots_file)[:n_shots]
-        parts = ["以下は、標準入力を読んで厳密に 1 行だけ出力するプログラムの例です。\n"]
+        parts = [sh["intro"]]
         for i, s in enumerate(shots, 1):
-            parts.append(f"例{i}）課題: {s['problem']}\n```{lang}\n{s['code']}```\n")
-        parts.append("では、同じ形式（標準入力を読み、指定どおり 1 行だけ出力）で次の課題を解いてください。\n")
-        shot_block = "\n".join(parts) + "\n"
+            parts.append(fill(sh["example"], i=i, problem=s["problem"], lang=lang, code=s["code"]))
+        parts.append(sh["outro"])
+        shot_block = sh["joiner"].join(parts) + sh["suffix"]
+
+    spec_lines = list(task["spec"]) + list(P.get("extra_spec") or [])
+    spec = "\n".join(fill(P["spec_item"], item=x) for x in spec_lines)
 
     return (
-        f"{head}{shot_block}"
-        f"【仕様】\n{spec}\n\n"
-        f"【言語・形式】\n- {LANGS[lang]['hint']}\n"
-        f"- コードのみを 1 つの ```{lang} コードブロックに入れて出力し、説明文は書かない。\n"
+        P["head"]
+        + shot_block
+        + fill(P["spec_block"], spec=spec)
+        + fill(P["format_block"], lang_hint=P["lang_hints"][lang], lang=lang)
     )
 
 
@@ -346,6 +370,8 @@ def write_report(report_dir, meta, records, code_ext):
     L.append(f"- **プロンプト**: {shot_label}（例示 {meta.get('shots', 0)} 件）")
     if meta.get("shots") and meta.get("shots_file", DEFAULT_SHOTS_FILE) != DEFAULT_SHOTS_FILE:
         L.append(f"- **例示セット**: `{meta['shots_file']}`")
+    if meta.get("prompt_set", DEFAULT_PROMPT_SET) != DEFAULT_PROMPT_SET:
+        L.append(f"- **プロンプトセット**: `{meta['prompt_set']}`（`pipeline/prompts.json`）")
     L.append(f"- **世代数 k**: {n}")
     L.append(f"- **temperature**: {meta['temp']}")
     L.append(f"- **think**: {str(meta['think']).lower()}")
@@ -406,8 +432,11 @@ def write_report(report_dir, meta, records, code_ext):
     if meta.get("shots") and meta.get("shots_file", DEFAULT_SHOTS_FILE) != DEFAULT_SHOTS_FILE:
         shotflag += f" --shots-file {meta['shots_file']}"
     taskflag = f" --task {meta['task']}" if meta.get("task") != "cwe400_unique" else ""
+    promptflag = ("" if meta.get("prompt_set", DEFAULT_PROMPT_SET) == DEFAULT_PROMPT_SET
+                  else f" --prompt {meta['prompt_set']}")
     L.append(f"python3 pipeline/pipeline.py{taskflag} --lang {meta['langflag']} "
-             f"--model {meta['model']} -k {n} --temperature {meta['temp']}{shotflag}{thinkflag}")
+             f"--model {meta['model']} -k {n} --temperature {meta['temp']}"
+             f"{shotflag}{promptflag}{thinkflag}")
     L.append("```")
     L.append("")
     L.append(f"生成された全世代のソースは同ディレクトリの `code/gen_01.{code_ext}` … に格納。")
@@ -431,6 +460,10 @@ def main():
     ap.add_argument("--shots-file", default=DEFAULT_SHOTS_FILE,
                     help="例示セット（既定 shots.json）。shots_safe / shots_unsafe で"
                          "例示の資源安全性を切り替える")
+    ap.add_argument("--prompt", default=DEFAULT_PROMPT_SET,
+                    help="プロンプトセット（既定 default）。文言は pipeline/prompts.json で管理する")
+    ap.add_argument("--print-prompt", action="store_true",
+                    help="組み立てたプロンプトを表示して終了する（生成も検証もしない）")
     ap.add_argument("--think", action="store_true",
                     help="thinking を有効化（qwen3.5 等の thinking モデル向け・低速）")
     ap.add_argument("--no-serve", action="store_true", help="serve を自動起動しない")
@@ -444,12 +477,16 @@ def main():
         sys.exit(f"未知のタスク: {args.task}（候補: {', '.join(tasks)}）")
     task = tasks[args.task]
 
+    prompt = build_prompt(task, args.lang, args.shots, args.shots_file, args.prompt)
+    if args.print_prompt:
+        print(prompt, end="")
+        return
+
     if not args.dry_run:
         ensure_docker()
     ensure_ollama(auto_serve=not args.no_serve)
     ensure_model(args.model)
 
-    prompt = build_prompt(task, args.lang, args.shots, args.shots_file)
     gen_dir = os.path.join(REPO, "generated", args.lang)
     os.makedirs(gen_dir, exist_ok=True)
 
@@ -517,6 +554,7 @@ def main():
         meta = {"model": args.model, "lang": args.lang, "langflag": args.lang,
                 "temp": args.temperature, "think": args.think, "n": n,
                 "shots": args.shots, "shots_file": args.shots_file,
+                "prompt_set": args.prompt,
                 "task": args.task, "title": task["title"]}
         write_report(args.report_dir, meta, records, code_ext)
 

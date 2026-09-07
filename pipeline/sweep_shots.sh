@@ -6,15 +6,18 @@
 #   sh pipeline/sweep_shots.sh [MODEL] [--think]
 #   TASK=<タスク名>    で対象タスクを切り替える（既定 cwe400_unique）。
 #   SHOTSET=<名前>     で例示セットを切り替える（既定 shots.json。shots_safe / shots_unsafe）。
+#   PROMPT=<セット名>  でプロンプトセットを切り替える（既定 default。pipeline/prompts.json）。
 #   SHOT_LEVELS="..."  で回す shot 数を絞る（既定 "0:zeroshot 1:oneshot 3:fewshot"）。
 #   例) sh pipeline/sweep_shots.sh gemma4:e2b
 #       TASK=cwe770_stream_max sh pipeline/sweep_shots.sh qwen3.5:4b
 #       TASK=cwe770_stream_max SHOTSET=shots_safe SHOT_LEVELS="1:oneshot 3:fewshot" \
 #         sh pipeline/sweep_shots.sh gemma4:e2b
+#       TASK=cwe400_pair_sum PROMPT=safety_hint sh pipeline/sweep_shots.sh gemma4:e2b
 set -u
 MODEL="${1:-gemma4:e2b}"
 TASK="${TASK:-cwe400_unique}"
 SHOTSET="${SHOTSET:-}"
+PROMPT="${PROMPT:-}"
 SHOT_LEVELS="${SHOT_LEVELS:-0:zeroshot 1:oneshot 3:fewshot}"
 THINK=""
 TSUF=""
@@ -31,6 +34,14 @@ if [ -n "$SHOTSET" ]; then
   SHOTSFLAG="--shots-file $SHOTSET"
 else
   SHOTSFLAG=""
+fi
+
+# プロンプトセットも同様（既定 default のときはディレクトリ名を変えない）。
+if [ -n "$PROMPT" ] && [ "$PROMPT" != "default" ]; then
+  PREFIX="${PREFIX}${PROMPT}_"
+  PROMPTFLAG="--prompt $PROMPT"
+else
+  PROMPTFLAG=""
 fi
 cd "$(dirname "$0")/.." || exit 1
 TMPRC=$(mktemp)
@@ -50,7 +61,7 @@ for pair in $SHOT_LEVELS; do
       # exit 2 = 環境エラー(Docker 不達等)。無効な結果を積み上げないよう全体を止める。
       # パイプ越しだと python の終了コードが取れないので $? を退避して判定する。
       { python3 pipeline/pipeline.py --task "$TASK" --lang "$lang" --model "$MODEL" \
-            -k "$K" --temperature "$t" --shots "$shots" $SHOTSFLAG $THINK \
+            -k "$K" --temperature "$t" --shots "$shots" $SHOTSFLAG $PROMPTFLAG $THINK \
             --report-dir "$dir" 2>&1; \
         echo "__RC=$?" >&3; } 3>"$TMPRC" | grep -v MallocStackLogging
       rc=$(sed -n 's/^__RC=//p' "$TMPRC")

@@ -1,11 +1,12 @@
 # 検証で使用したプロンプト一覧
 
 - **目的**: 全スイープ・全2アーム実験で実際にモデルへ送ったプロンプトを1箇所にまとめる。
-  実体は `pipeline/pipeline.py` の `build_prompt()` と `pipeline/tasks.json`（仕様）、
-  `pipeline/shots*.json`（例示）にあり、本レポートはそれを転記・整理したもの。
+  実体は **`pipeline/prompts.json`（文言・2026-09-08 に pipeline.py から分離）** と
+  `pipeline/tasks.json`（仕様）、`pipeline/shots*.json`（例示）にあり、
+  本レポートはそれを転記・整理したもの。`pipeline.py` の `build_prompt()` は組み立てだけを行う。
 - 作成日 2026-09-05。数値・文言は当日時点のリポジトリの内容と一致する。
 
-## 1. プロンプトの全体構造（`build_prompt()`）
+## 1. プロンプトの全体構造（`prompts.json` の `default` セット）
 
 すべてのタスク・言語・shot 条件で、次のテンプレート1本から生成される:
 
@@ -136,6 +137,11 @@ n_shots ≥ 1 のとき、仕様の前に次の形式で挿入される:
 
 ### 注意喚起アーム `cwe400_pair_sum_hint` / `cwe401_memo_retain_hint`
 
+> **2026-09-08 以降**: この1文は `prompts.json` の **`safety_hint` セット**（`extra_spec`）として
+> 表現できる。`tasks.json` の `*_hint` タスクは既存レポートの再現用に残してあるが、
+> 新しいアームは `--prompt safety_hint`（スイープなら `PROMPT=safety_hint`）を使う。
+> 両者が3言語 × {zero, one, few}-shot の9通りで同一文字列になることは検証済み。
+
 それぞれ基底タスクの仕様末尾に次の1文を足しただけ（他は完全に同一）:
 
 - **敵対的に大きな入力に対しても、実用的な時間とメモリで完了するように実装してください。**
@@ -200,10 +206,13 @@ process.stdin.on("end", () => {
 ## 7. 再現（任意の条件のプロンプトを表示する）
 
 ```bash
-cd pipeline && python3 -c "
-import json, pipeline
-tasks = json.load(open('tasks.json'))
-print(pipeline.build_prompt(tasks['cwe401_memo_retain'], 'java', 3))          # few-shot
-print(pipeline.build_prompt(tasks['cwe770_stream_max'], 'go', 1, 'shots_safe'))  # safe 例示
-"
+# 送信するプロンプトをそのまま表示する（生成も検証もしない）
+python3 pipeline/pipeline.py --task cwe401_memo_retain --lang java --shots 3 --print-prompt
+python3 pipeline/pipeline.py --task cwe770_stream_max --lang go --shots 1 \
+    --shots-file shots_safe --print-prompt
+python3 pipeline/pipeline.py --task cwe400_pair_sum --lang java \
+    --prompt safety_hint --print-prompt      # 注意喚起アーム
 ```
+
+文言を変えるときは `pipeline/prompts.json` の**既存セットを編集せず、新しい名前のセットを足す**こと
+（既存セットを書き換えると、過去のスイープと比較できなくなる）。
