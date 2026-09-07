@@ -6,6 +6,8 @@
   経路上の中間値は 814万件に膨れる。`rss_limit_kb=204800`、`timeout_s=10`。
 - **閾値の根拠**: `docs/cwe401_calibration.md`
 - **各条件 k=10**、36条件360世代。取得日 2026-08-27、`docker_err` 0件。
+- 同一タスクの qwen3.5:4b 版は `reports/SUMMARY_cwe401_memo_retain_qwen3.5_4b.md`、
+  qwen2.5-coder:1.5b 版は `reports/SUMMARY_cwe401_memo_retain_qwen2.5_coder_1.5b.md`。
 - **GC 言語での CWE-401**: free 忘れは再現できないため「解放されない保持＝上限のないキャッシュ」として表現。
 
 > **注意**: 初回スイープは機能ケースが小さすぎ、int32 桁溢れによる失敗が混入していた。

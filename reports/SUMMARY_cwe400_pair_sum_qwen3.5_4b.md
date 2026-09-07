@@ -6,7 +6,8 @@
 - **閾値の根拠**: `docs/cwe400_pair_sum_calibration.md`
 - **各条件 k=10**、zero/one/few-shot × go/ts/java × 温度 {0.1, 0.4, 0.7, 1.0} の36条件360世代。
 - 取得日 2026-08-28、`docker_err` 0件。
-- 同一タスクの gemma4:e2b 版は `reports/SUMMARY_cwe400_pair_sum.md`。
+- 同一タスクの gemma4:e2b 版は `reports/SUMMARY_cwe400_pair_sum.md`、
+  qwen2.5-coder:1.5b 版は `reports/SUMMARY_cwe400_pair_sum_qwen2.5_coder_1.5b.md`。
 
 ## 結論
 
