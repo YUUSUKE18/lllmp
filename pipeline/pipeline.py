@@ -447,6 +447,25 @@ def write_report(report_dir, meta, records, code_ext):
     print(f"■ レポート出力: {os.path.join(report_dir, 'result.md')}")
 
 
+def log_prompt(args, task, prompt, n):
+    """送ったプロンプトを prompt/ に蓄積する（論文の付録にそのまま載せるため）。
+    ここでの失敗は検証結果を捨てる理由にならないので握りつぶして警告だけ出す。"""
+    import datetime
+    sys.path.insert(0, os.path.join(REPO, "pipeline"))
+    import prompt_log
+    d = os.path.abspath(args.report_dir)
+    rel = os.path.relpath(d, REPO) if d.startswith(REPO + os.sep) else d
+    run = {"report_dir": rel, "model": args.model, "temp": args.temperature,
+           "k": n, "think": args.think, "date": datetime.date.today().isoformat()}
+    try:
+        path = prompt_log.record(args.task, task, args.lang, args.shots, prompt, run,
+                                 args.shots_file, args.prompt)
+        prompt_log.write_index()
+        print(f"■ プロンプト記録: {os.path.relpath(path, REPO)}")
+    except Exception as e:  # noqa: BLE001 - 記録の失敗で結果を落とさない
+        print(f"！プロンプトの記録に失敗（結果は保存済み）: {e}", file=sys.stderr)
+
+
 # ------------------------------------------------------------------ main --
 def main():
     ap = argparse.ArgumentParser(description="Ollama 生成 → 動的テスト検証 → func/sec@k 集計")
@@ -557,6 +576,7 @@ def main():
                 "prompt_set": args.prompt,
                 "task": args.task, "title": task["title"]}
         write_report(args.report_dir, meta, records, code_ext)
+        log_prompt(args, task, prompt, n)
 
 
 if __name__ == "__main__":
