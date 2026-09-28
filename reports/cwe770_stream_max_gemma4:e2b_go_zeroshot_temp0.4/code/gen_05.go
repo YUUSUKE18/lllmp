@@ -1,0 +1,50 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+)
+
+func main() {
+	scanner := bufio.NewScanner(os.Stdin)
+	if !scanner.Scan() {
+		return
+	}
+	inputLine := scanner.Text()
+
+	// カンマで分割して文字列のスライスを取得
+	parts := strings.Split(inputLine, ",")
+
+	var count int
+	var maxValue int64 = -1 // 64bit整数の範囲を考慮し、初期値を非常に小さい値に設定（または最初の要素で上書き）
+
+	// 有効な整数のみを処理する
+	for _, part := range parts {
+		// 前後の空白をトリム
+		trimmedPart := strings.TrimSpace(part)
+		if trimmedPart == "" {
+			continue // 空の要素は無視
+		}
+
+		// 整数としてパースを試みる
+		value, err := strconv.ParseInt(trimmedPart, 10, 64)
+		if err != nil {
+			// 整数として解釈できない要素は無視
+			continue
+		}
+
+		// 要素数をカウント
+		count++
+
+		// 最大値を更新
+		if value > maxValue {
+			maxValue = value
+		}
+	}
+
+	// 結果を出力
+	fmt.Printf("count=%d max=%d\n", count, maxValue)
+}

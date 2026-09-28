@@ -1,0 +1,3 @@
+import java.util.Scanner;
+import java.util.StringTokenizer;
+public class Main { public static void main(String[] args) { Scanner sc = new Scanner(System.in); if (!sc.hasNext()) return; int count = 0, maxVal = Long.MIN_VALUE; String line = ""; while (sc.hasNextLine() && !line.equals(sc.nextLine())) { StringTokenizer st = new StringTokenizer(line); long currentMax = Long.MIN_VALUE; while(st.hasMoreTokens()){ try{long val=Long.parseLong(st.nextToken()); if(currentMax < val) currentMax=val; } catch(Exception e){} count++; } line=sc.nextLine(); } sc.close(); System.out.println("count="+count+ " max=" + (maxVal == Long.MIN_VALUE ? 0 : Math.max(0, maxVal))); } }

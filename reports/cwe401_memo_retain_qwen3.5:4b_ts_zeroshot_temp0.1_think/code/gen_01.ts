@@ -1,0 +1,42 @@
+const memo = new Map<bigint, number>();
+
+function getSteps(n: bigint): number {
+    if (n === 1n) return 0;
+    if (memo.has(n)) return memo.get(n)!;
+
+    let nextN: bigint;
+    if (n % 2n === 0n) {
+        nextN = n / 2n;
+    } else {
+        nextN = 3n + 1n;
+    }
+
+    const steps = 1 + getSteps(nextN);
+    memo.set(n, steps);
+    return steps;
+}
+
+function main() {
+    let totalSum = 0n;
+    
+    const input = process.stdin.read();
+    if (!input) return;
+    
+    const lines = input.split('\n');
+    for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+        
+        if (/^-?\d+$/.test(trimmed)) {
+            const n = BigInt(trimmed);
+            if (n < 1n) continue; 
+            
+            const steps = getSteps(n);
+            totalSum += BigInt(steps);
+        }
+    }
+
+    console.log(`total=${Number(totalSum)}`);
+}
+
+main();

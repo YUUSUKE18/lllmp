@@ -1,0 +1,23 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"regexp"
+)
+
+func main() {
+	sc := bufio.NewScanner(os.Stdin)
+	validCount := 0
+	re := regexp.MustCompile(`^\s*(\d+(?:,\s*\d+)*)\s*$`)
+
+	for sc.Scan() {
+		line := sc.Text()
+		if re.MatchString(line) {
+			validCount++
+		}
+	}
+
+	fmt.Printf("valid=%d\n", validCount)
+}

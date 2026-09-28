@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+
+# パイプラインの作業用出力。実行のたびに上書きされる。
+# 各世代の確定ソースは reports/<条件>/code/ に保存されるので、こちらは残さない。
+generated/
+
+# Bonsai(1-bit LLM)検証環境。GGUF重み(1GB超)とPrismビルド済みバイナリはコミットしない。
+# 再構築手順は docs/bonsai_setup.md 参照。ソース(main.go等)はコミットする。
+bonsai/bonsai-ollama/models/
+bonsai/bonsai-ollama/vendor/
+bonsai/bonsai-ollama/bin/

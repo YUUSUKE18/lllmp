@@ -1,0 +1,21 @@
+const readline = require('readline');
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+let target = parseInt(process.stdin.readline().strip());
+let numbers = [];
+
+rl.on('line', (line) => {
+  const num = parseInt(line.trim());
+  if (!isNaN(num) && num >= 0 && num <= 2**63 - 1) {
+    numbers.push(num);
+  }
+});
+
+rl.on('close', () => {
+  const pairs = numbers.length - (numbers.length - numbers.filter(n => n === target).length);
+  console.log(`pairs=${pairs}`);
+});

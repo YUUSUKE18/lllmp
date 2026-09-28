@@ -1,0 +1,55 @@
+import java.util.Scanner;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.stream.Collectors;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        if (!scanner.hasNextLine()) {
+            // 入力が空の場合は何もしない
+            return;
+        }
+
+        String line = scanner.nextLine();
+        
+        // カンマで分割し、各要素を処理する
+        String[] parts = line.split(",");
+        
+        Set<Integer> uniqueNumbers = new HashSet<>();
+        long sum = 0;
+
+        for (String part : parts) {
+            // 前後の空白を除去
+            String trimmedPart = part.trim();
+            if (trimmedPart.isEmpty()) {
+                continue;
+            }
+
+            try {
+                // 整数として解析
+                int number = Integer.parseInt(trimmedPart);
+                uniqueNumbers.add(number);
+            } catch (NumberFormatException e) {
+                // 整数として解釈できない要素は無視
+                continue;
+            }
+        }
+
+        // 重複を除いた数の個数と合計を計算
+        long count = uniqueNumbers.size();
+        long totalSum = 0;
+        for (int num : uniqueNumbers) {
+            totalSum += num;
+        }
+        
+        // または Stream を使用して合計を計算することも可能だが、上記のループでも十分高速で確実
+        // long totalSumStream = uniqueNumbers.stream().mapToLong(Integer::longValue).sum();
+
+
+        // 結果を出力
+        System.out.println("count=" + count + " sum=" + totalSum);
+        
+        scanner.close();
+    }
+}

@@ -1,0 +1,88 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        long totalCount = 0;
+        Map<Long, Long> memo = new HashMap<>();
+
+        while (true) {
+            String line = br.readLine();
+            if (line == null || line.trim().isEmpty()) {
+                continue;
+            }
+
+            try {
+                long n = Long.parseLong(line.trim());
+
+                if (n == 1) {
+                    // 1 に到達するまでの手数は 0
+                    totalCount += 0;
+                    continue;
+                }
+
+                if (memo.containsKey(n)) {
+                    totalCount += memo.get(n);
+                    continue;
+                }
+
+                // 計算とメモ化
+                long steps;
+                if (n % 2 == 0) {
+                    // n が偶数なら n/2
+                    steps = 1 + memo.getOrDefault(n / 2, 0);
+                } else {
+                    // n が奇数なら 3n+1
+                    steps = 1 + memo.getOrDefault(3 * n + 1, 0);
+                }
+
+                // ここでのメモ化のロジックは、問題文の「n が 1 のときの手数は 0」という定義と
+                // 「n が 1 に到達するまでの手数を求める」という要求をどう解釈するかで変わります。
+                // 通常、この問題は Collatz プロブレムのステップ数を求めるものです。
+                // ここでは、n から 1 に到達するまでのステップ数を求める、という解釈で再計算します。
+
+                // 再度、n から 1 へのステップ数を求める（メモ化を利用）
+                long currentN = n;
+                long count = 0;
+                Map<Long, Long> pathMemo = new HashMap<>();
+                pathMemo.put(1L, 0L);
+
+                while (currentN != 1) {
+                    if (pathMemo.containsKey(currentN)) {
+                        // 既に計算済みの経路があれば、その結果を足し合わせる
+                        count += pathMemo.get(currentN);
+                        break;
+                    }
+
+                    if (currentN % 2 == 0) {
+                        currentN /= 2;
+                    } else {
+                        currentN = 3 * currentN + 1;
+                    }
+                    count++;
+                    
+                    // 途中の値が非常に大きくなる可能性があるため、64bitで管理
+                    if (currentN > Long.MAX_VALUE / 3) {
+                        // 64bitの範囲を超えた場合は、計算を中断またはエラー処理が必要だが、
+                        // 問題文の指示に従い、64bitで収まることを前提とする。
+                        // ここでは、一旦計算を続行する。
+                    }
+                }
+                
+                // 最終的な結果をメモ化（これは、元の n から 1 へのステップ数）
+                memo.put(n, count);
+                totalCount += count;
+
+
+            } catch (NumberFormatException e) {
+                // 整数として解釈できない行は無視
+            }
+        }
+
+        System.out.println("total=" + totalCount);
+    }
+}

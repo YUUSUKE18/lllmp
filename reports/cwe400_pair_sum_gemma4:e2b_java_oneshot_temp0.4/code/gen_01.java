@@ -1,0 +1,54 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        
+        // 1行目を読み込み、目標値を設定
+        String targetLine = br.readLine();
+        if (targetLine == null) {
+            System.out.println("pairs=0");
+            return;
+        }
+        long target = Long.parseLong(targetLine.trim());
+
+        List<Long> numbers = new ArrayList<>();
+        String line;
+
+        // 2行目以降を読み込み、整数を収集
+        while ((line = br.readLine()) != null) {
+            String trimmedLine = line.trim();
+            if (trimmedLine.isEmpty()) {
+                continue;
+            }
+            try {
+                numbers.add(Long.parseLong(trimmedLine));
+            } catch (NumberFormatException e) {
+                // 整数として解釈できない行は無視
+            }
+        }
+
+        // 2個の組の個数を計算
+        long count = 0;
+        int n = numbers.size();
+
+        // 2つの要素 a と b が存在し、a + b = target となるペア (a, b) を数える
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j < n; j++) {
+                long num1 = numbers.get(i);
+                long num2 = numbers.get(j);
+                
+                if (num1 + num2 == target) {
+                    count++;
+                }
+            }
+        }
+
+        // 結果を出力
+        System.out.println("pairs=" + count);
+    }
+}

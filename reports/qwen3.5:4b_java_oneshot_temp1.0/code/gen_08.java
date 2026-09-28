@@ -1,0 +1,34 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.HashSet;
+import java.util.Set;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String line = br.readLine();
+        Set<Integer> uniqueValues = new HashSet<>();
+        
+        if (line != null) {
+            String[] parts = line.split(",");
+            for (String part : parts) {
+                part = part.trim();
+                if (part.isEmpty()) continue;
+                try {
+                    int value = Integer.parseInt(part);
+                    uniqueValues.add(value);
+                } catch (NumberFormatException e) {
+                    // 整数として解釈できない要素は無視
+                }
+            }
+        }
+
+        long count = uniqueValues.size();
+        long sum = 0;
+        for (int val : uniqueValues) {
+            sum += val;
+        }
+
+        System.out.println("count=" + count + " sum=" + sum);
+    }
+}

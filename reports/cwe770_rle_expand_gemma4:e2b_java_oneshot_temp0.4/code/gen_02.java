@@ -1,0 +1,53 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String line = br.readLine();
+
+        if (line == null || line.trim().isEmpty()) {
+            System.out.println("count=0 sum=0");
+            return;
+        }
+
+        long totalCount = 0;
+        long totalSum = 0;
+
+        // カンマで区切って各要素を処理
+        String[] parts = line.split(",");
+
+        for (String part : parts) {
+            String trimmedPart = part.trim();
+            if (trimmedPart.isEmpty()) continue;
+
+            // 値:回数 の形式でパース
+            String[] keyValue = trimmedPart.split(":");
+            if (keyValue.length != 2) {
+                continue; // 形式が不正な場合は無視
+            }
+
+            try {
+                // 値 (Value)
+                int value = Integer.parseInt(keyValue[0].trim());
+                // 回数 (Count)
+                int count = Integer.parseInt(keyValue[1].trim());
+
+                if (count > 0) {
+                    // 要素数 (要素数) の計算
+                    totalCount += count;
+                    // 合計 (合計) の計算: 値 * 回数
+                    totalSum += (long) value * count;
+                }
+            } catch (NumberFormatException e) {
+                // 数値変換エラーが発生した場合は無視
+                continue;
+            }
+        }
+
+        System.out.println("count=" + totalCount + " sum=" + totalSum);
+    }
+}

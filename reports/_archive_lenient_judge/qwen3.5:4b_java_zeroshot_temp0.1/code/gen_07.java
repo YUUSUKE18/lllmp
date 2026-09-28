@@ -1,0 +1,34 @@
+import java.util.Scanner;
+import java.math.BigInteger;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        
+        // 重複を除いた整数の集合を作成し、合計を計算する
+        BigInteger sum = BigInteger.ZERO;
+        int count = 0;
+        
+        while (scanner.hasNext()) {
+            String token = scanner.next();
+            
+            try {
+                long value = Long.parseLong(token);
+                
+                // 既にカウント済みかチェック（HashSet を使用して重複を除外）
+                if (!summed.contains(value)) {
+                    summed.add(value);
+                    
+                    sum = sum.add(BigInteger.valueOf(value));
+                    count++;
+                }
+            } catch (NumberFormatException e) {
+                // 整数として解釈できない要素は無視する
+            }
+        }
+        
+        System.out.println("count=" + count + " sum=" + sum.toString());
+    }
+
+    private static java.util.Set<Long> summed = new java.util.HashSet<>();
+}

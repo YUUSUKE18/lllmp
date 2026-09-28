@@ -1,0 +1,33 @@
+const memo = new Map<number, number>();
+let total = 0;
+
+function steps(n: number): number {
+  if (n === 1) return 0;
+  if (memo.has(n)) return memo.get(n)!;
+  
+  let next: number;
+  if (n % 2 === 0) {
+    next = n / 2;
+  } else {
+    next = 3 * n + 1;
+  }
+  
+  const s = steps(next);
+  memo.set(n, s + 1);
+  return s + 1;
+}
+
+process.stdin.on("data", (c: Buffer) => {
+  const lines = c.toString("utf8").split("\n");
+  for (const line of lines) {
+    if (line.trim() === "") continue;
+    const n = parseInt(line, 10);
+    if (!Number.isNaN(n)) {
+      total += steps(n);
+    }
+  }
+});
+
+process.stdin.on("end", () => {
+  console.log(`total=${total}`);
+});
