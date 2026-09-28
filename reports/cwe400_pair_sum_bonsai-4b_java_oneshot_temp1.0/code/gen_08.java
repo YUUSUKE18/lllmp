@@ -1,0 +1,38 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String line = br.readLine();
+        int target = 0;
+        int pairs = 0;
+        if (line != null) {
+            try {
+                target = Integer.parseInt(line.trim());
+            } catch (NumberFormatException e) {
+                return;
+            }
+            boolean first = true;
+            int[] numbers = new int[1000000];
+            int index = 0;
+            for (int i = 0; i < 1000000; i++) {
+                String f = br.readLine();
+                if (f == null || f.trim().isEmpty()) continue;
+                try {
+                    int n = Integer.parseInt(f.trim());
+                    if (n >= target && n <= target + 1) {
+                        if (first || index < 999999) {
+                            pairs++;
+                            first = false;
+                            index++;
+                        }
+                    }
+                } catch (NumberFormatException e) {
+                    continue;
+                }
+            }
+        }
+        System.out.println("pairs=" + pairs);
+    }
+}

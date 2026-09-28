@@ -4,7 +4,7 @@
 - **言語**: java
 - **例示**: one-shot（セット `shots.json`）
 - **プロンプトセット**: `default`（`pipeline/prompts.json`）
-- **このプロンプトを使った検証**: 12 条件
+- **このプロンプトを使った検証**: 20 条件
 
 ## 送信したプロンプト（全文・実際に送った文字列そのまま）
 
@@ -58,6 +58,14 @@ public class Main {
 
 | 取得日 | 条件 | モデル | temp | k | think | 記録 |
 |---|---|---|---|---|---|---|
+| 2026-09-16 | `reports/cwe401_memo_retain_bonsai-4b_java_oneshot_temp0.1` | `bonsai-4b` | 0.1 | 10 | false | 実行時 |
+| 2026-09-16 | `reports/cwe401_memo_retain_bonsai-4b_java_oneshot_temp0.4` | `bonsai-4b` | 0.4 | 10 | false | 実行時 |
+| 2026-09-16 | `reports/cwe401_memo_retain_bonsai-4b_java_oneshot_temp0.7` | `bonsai-4b` | 0.7 | 10 | false | 実行時 |
+| 2026-09-16 | `reports/cwe401_memo_retain_bonsai-4b_java_oneshot_temp1.0` | `bonsai-4b` | 1.0 | 10 | false | 実行時 |
+| 2026-09-10 | `reports/cwe401_memo_retain_bonsai-8b_java_oneshot_temp0.1` | `bonsai-8b` | 0.1 | 10 | false | 実行時 |
+| 2026-09-10 | `reports/cwe401_memo_retain_bonsai-8b_java_oneshot_temp0.4` | `bonsai-8b` | 0.4 | 10 | false | 実行時 |
+| 2026-09-10 | `reports/cwe401_memo_retain_bonsai-8b_java_oneshot_temp0.7` | `bonsai-8b` | 0.7 | 10 | false | 実行時 |
+| 2026-09-10 | `reports/cwe401_memo_retain_bonsai-8b_java_oneshot_temp1.0` | `bonsai-8b` | 1.0 | 10 | false | 実行時 |
 | 2026-08-27 | `reports/cwe401_memo_retain_gemma4:e2b_java_oneshot_temp0.1` | `gemma4:e2b` | 0.1 | 10 | false | 復元 |
 | 2026-08-27 | `reports/cwe401_memo_retain_gemma4:e2b_java_oneshot_temp0.4` | `gemma4:e2b` | 0.4 | 10 | false | 復元 |
 | 2026-08-27 | `reports/cwe401_memo_retain_gemma4:e2b_java_oneshot_temp0.7` | `gemma4:e2b` | 0.7 | 10 | false | 復元 |

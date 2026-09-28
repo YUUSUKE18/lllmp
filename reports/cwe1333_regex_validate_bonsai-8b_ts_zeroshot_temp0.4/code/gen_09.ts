@@ -1,0 +1,10 @@
+const lines = process.stdin.read().split('\n');
+const validLines = lines
+  .filter(line => {
+    line = line.trim();
+    if (!line) return false;
+    const parts = line.split(',');
+    return parts.length >= 2 && parts.every(part => part.trim() !== '');
+  });
+
+console.log(`valid=${validLines.length}`);

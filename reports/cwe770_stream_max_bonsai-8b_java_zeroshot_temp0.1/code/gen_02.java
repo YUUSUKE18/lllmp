@@ -1,0 +1,25 @@
+import java.util.*;
+import java.io.*;
+
+public class Main {
+    public static void main(String[] args) throws IOException {
+        Scanner scanner = new Scanner(System.in);
+        List<Integer> numbers = new ArrayList<>();
+        String input = scanner.nextLine();
+        String[] parts = input.trim().split(",");
+        for (String part : parts) {
+            part = part.trim();
+            if (!part.isEmpty() && Integer.parseInt(part) != Integer.MIN_VALUE && Integer.parseInt(part) != Integer.MAX_VALUE) {
+                numbers.add(Integer.parseInt(part));
+            }
+        }
+        int count = numbers.size();
+        int max = Integer.MIN_VALUE;
+        for (int num : numbers) {
+            if (num > max) {
+                max = num;
+            }
+        }
+        System.out.println("count=" + count + " max=" + max);
+    }
+}

@@ -1,0 +1,32 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"regexp"
+	"strings"
+)
+
+func main() {
+	sc := bufio.NewScanner(os.Stdin)
+	var validLines []string
+	sc.Scan()
+
+	for {
+		sc.Scan()
+		if sc.Err() {
+			break
+		}
+		line := strings.TrimSpace(sc.Text())
+		if line == "" {
+			continue
+		}
+		re := regexp.MustCompile(`^(\d+)(?:,\d+)*$`)
+		if re.MatchString(line) {
+			validLines = append(validLines, line)
+		}
+	}
+
+	fmt.Printf("valid=%d\n", len(validLines))
+}

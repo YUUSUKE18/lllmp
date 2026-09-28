@@ -1,0 +1,17 @@
+# Built binaries (rebuild: ./bin/setup.sh or ./bin/run.sh)
+bin/bonsai-ollama-proxy
+bin/bench_llama_tokens
+bin/verify_stream
+bin/publish_ollama_hub_readme
+
+# Local Ollama tarball experiments
+.ollama-upgrade/
+
+# Prism llama.cpp drop (~50+ MiB); download per README
+vendor/prism-llama/
+
+# Model weights (~237 MiB); download from Hugging Face
+models/**/*.gguf
+
+# Stray root binary from local go build
+/main

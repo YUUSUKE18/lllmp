@@ -4,7 +4,7 @@
 - **言語**: go
 - **例示**: zero-shot
 - **プロンプトセット**: `default`（`pipeline/prompts.json`）
-- **このプロンプトを使った検証**: 8 条件
+- **このプロンプトを使った検証**: 14 条件
 
 ## 送信したプロンプト（全文・実際に送った文字列そのまま）
 
@@ -28,10 +28,16 @@
 
 | 取得日 | 条件 | モデル | temp | k | think | 記録 |
 |---|---|---|---|---|---|---|
+| 2026-09-10 | `reports/cwe1333_regex_required_bonsai-8b_go_zeroshot_temp0.1` | `bonsai-8b` | 0.1 | 10 | false | 実行時 |
+| 2026-09-10 | `reports/cwe1333_regex_required_bonsai-8b_go_zeroshot_temp0.4` | `bonsai-8b` | 0.4 | 10 | false | 実行時 |
+| 2026-09-10 | `reports/cwe1333_regex_required_bonsai-8b_go_zeroshot_temp0.7` | `bonsai-8b` | 0.7 | 10 | false | 実行時 |
+| 2026-09-10 | `reports/cwe1333_regex_required_bonsai-8b_go_zeroshot_temp1.0` | `bonsai-8b` | 1.0 | 10 | false | 実行時 |
+| 2026-09-22 | `reports/cwe1333_regex_required_gemma4:e2b_go_zeroshot_temp0.1_think` | `gemma4:e2b` | 0.1 | 10 | true | 実行時 |
 | 2026-08-20 | `reports/cwe1333_regex_required_gemma4:e2b_go_zeroshot_temp0.1` | `gemma4:e2b` | 0.1 | 10 | false | 復元 |
 | 2026-08-21 | `reports/cwe1333_regex_required_gemma4:e2b_go_zeroshot_temp0.4` | `gemma4:e2b` | 0.4 | 10 | false | 復元 |
 | 2026-08-21 | `reports/cwe1333_regex_required_gemma4:e2b_go_zeroshot_temp0.7` | `gemma4:e2b` | 0.7 | 10 | false | 復元 |
 | 2026-08-21 | `reports/cwe1333_regex_required_gemma4:e2b_go_zeroshot_temp1.0` | `gemma4:e2b` | 1.0 | 10 | false | 復元 |
+| 2026-09-18 | `reports/cwe1333_regex_required_qwen3.5:4b_go_zeroshot_temp0.1_think` | `qwen3.5:4b` | 0.1 | 10 | true | 実行時 |
 | 2026-08-30 | `reports/cwe1333_regex_required_qwen3.5:4b_go_zeroshot_temp0.1` | `qwen3.5:4b` | 0.1 | 10 | false | 復元 |
 | 2026-08-30 | `reports/cwe1333_regex_required_qwen3.5:4b_go_zeroshot_temp0.4` | `qwen3.5:4b` | 0.4 | 10 | false | 復元 |
 | 2026-08-30 | `reports/cwe1333_regex_required_qwen3.5:4b_go_zeroshot_temp0.7` | `qwen3.5:4b` | 0.7 | 10 | false | 復元 |

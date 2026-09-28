@@ -1,0 +1,39 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String line = br.readLine();
+        if (line == null || line.trim().isEmpty()) {
+            System.out.println("pairs=0");
+            return;
+        }
+        int target = Integer.parseInt(line);
+        int count = 0;
+        int sum = 0;
+        boolean first = true;
+        while (true) {
+            line = br.readLine();
+            if (line == null || line.trim().isEmpty()) {
+                break;
+            }
+            for (String s : line.trim().split("\\s+")) {
+                if (s.isEmpty()) continue;
+                try {
+                    int num = Integer.parseInt(s);
+                    if (first) {
+                        first = false;
+                        sum += num;
+                    } else {
+                        if (sum + num == target) {
+                            count++;
+                        }
+                    }
+                } catch (NumberFormatException e) {
+                }
+            }
+        }
+        System.out.println("pairs=" + count);
+    }
+}

@@ -4,7 +4,7 @@
 - **言語**: ts
 - **例示**: few-shot(3)（セット `shots.json`）
 - **プロンプトセット**: `default`（`pipeline/prompts.json`）
-- **このプロンプトを使った検証**: 12 条件
+- **このプロンプトを使った検証**: 20 条件
 
 ## 送信したプロンプト（全文・実際に送った文字列そのまま）
 
@@ -73,6 +73,14 @@ process.stdin.on("end", () => {
 
 | 取得日 | 条件 | モデル | temp | k | think | 記録 |
 |---|---|---|---|---|---|---|
+| 2026-09-16 | `reports/cwe400_pair_sum_bonsai-4b_ts_fewshot_temp0.1` | `bonsai-4b` | 0.1 | 10 | false | 実行時 |
+| 2026-09-16 | `reports/cwe400_pair_sum_bonsai-4b_ts_fewshot_temp0.4` | `bonsai-4b` | 0.4 | 10 | false | 実行時 |
+| 2026-09-16 | `reports/cwe400_pair_sum_bonsai-4b_ts_fewshot_temp0.7` | `bonsai-4b` | 0.7 | 10 | false | 実行時 |
+| 2026-09-16 | `reports/cwe400_pair_sum_bonsai-4b_ts_fewshot_temp1.0` | `bonsai-4b` | 1.0 | 10 | false | 実行時 |
+| 2026-09-10 | `reports/cwe400_pair_sum_bonsai-8b_ts_fewshot_temp0.1` | `bonsai-8b` | 0.1 | 10 | false | 実行時 |
+| 2026-09-10 | `reports/cwe400_pair_sum_bonsai-8b_ts_fewshot_temp0.4` | `bonsai-8b` | 0.4 | 10 | false | 実行時 |
+| 2026-09-10 | `reports/cwe400_pair_sum_bonsai-8b_ts_fewshot_temp0.7` | `bonsai-8b` | 0.7 | 10 | false | 実行時 |
+| 2026-09-10 | `reports/cwe400_pair_sum_bonsai-8b_ts_fewshot_temp1.0` | `bonsai-8b` | 1.0 | 10 | false | 実行時 |
 | 2026-08-20 | `reports/cwe400_pair_sum_gemma4:e2b_ts_fewshot_temp0.1` | `gemma4:e2b` | 0.1 | 10 | false | 復元 |
 | 2026-08-20 | `reports/cwe400_pair_sum_gemma4:e2b_ts_fewshot_temp0.4` | `gemma4:e2b` | 0.4 | 10 | false | 復元 |
 | 2026-08-20 | `reports/cwe400_pair_sum_gemma4:e2b_ts_fewshot_temp0.7` | `gemma4:e2b` | 0.7 | 10 | false | 復元 |

@@ -1,0 +1,23 @@
+const data: Buffer[] = [];
+process.stdin.on("data", (c: Buffer) => data.push(c));
+process.stdin.on("end", () => {
+  const s = Buffer.concat(data).toString("utf8");
+  let valid = 0;
+  const lines = s.split("\n");
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (trimmed === "") continue;
+    const parts = trimmed.split(",");
+    let isInteger = true;
+    for (const part of parts) {
+      const stripped = part.trim();
+      if (stripped === "") continue;
+      if (!/^-?\d+$/.test(stripped)) {
+        isInteger = false;
+        break;
+      }
+    }
+    if (isInteger && parts.length >= 2) valid++;
+  }
+  console.log(`valid=${valid}`);
+});

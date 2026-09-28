@@ -27,11 +27,16 @@ import subprocess
 import sys
 import tempfile
 import time
+import socket
+import urllib.error
 import urllib.request
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # OLLAMA_URL で差し替え可能（Ollama API 互換のシム/プロキシ経由で他バックエンドを使うため）
 OLLAMA = os.environ.get("OLLAMA_URL", "http://127.0.0.1:11434")
+# 1世代あたりの生成待ち上限(秒)。thinking を有効にすると 1 世代 13 分級になるため
+# 既定 600 では足りない。OLLAMA_TIMEOUT で伸ばす。
+OLLAMA_TIMEOUT = int(os.environ.get("OLLAMA_TIMEOUT", "600"))
 
 # 言語ごとの差分だけをここに閉じ込める（隔離/計測は共通イメージ側）
 LANGS = {
@@ -107,6 +112,10 @@ def ensure_ollama(auto_serve=True, wait_s=30):
 
 def ensure_model(model):
     """モデルがローカルに無ければ pull する。"""
+    if model.lower().startswith("bonsai"):
+        # bonsai-ollama プロキシ側で BONSAI_GGUF が指す重みを直接ロードしており、
+        # 通常の ollama レジストリには存在しないモデル名なので pull を試みない。
+        return
     try:
         tags = json.loads(urllib.request.urlopen(OLLAMA + "/api/tags", timeout=5).read())
         names = {m["name"] for m in tags.get("models", [])}
@@ -200,13 +209,19 @@ def build_prompt(task, lang, n_shots=0, shots_file=DEFAULT_SHOTS_FILE,
     )
 
 
-def generate(model, prompt, temperature, think=False):
+def generate(model, prompt, temperature, think=False, extra_options=None):
     # think=False: thinking 系モデル(qwen3.5 等)が推論に予算を使い切り response を空にするのを防ぐ。
     #   ただし thinking を切ると小型モデルは品質が落ちるため、必要なら --think で有効化する
     #   （その場合 num_ctx を広げないと応答が切れることがある）。
     opts = {"temperature": temperature}
     if think:
         opts["num_ctx"] = 8192
+    if model.lower().startswith("bonsai"):
+        # bonsai-ollama プロキシの既定 num_predict=512 だと関数コードが途中で切れるため広げる。
+        opts["num_predict"] = 2048
+    if extra_options:
+        # --options で明示された sampling 等の上書き（result.md に記録される）。
+        opts.update(extra_options)
     body = json.dumps({
         "model": model,
         "prompt": prompt,
@@ -216,7 +231,7 @@ def generate(model, prompt, temperature, think=False):
     }).encode()
     req = urllib.request.Request(OLLAMA + "/api/generate", data=body,
                                  headers={"Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=600) as r:
+    with urllib.request.urlopen(req, timeout=OLLAMA_TIMEOUT) as r:
         return json.loads(r.read())["response"]
 
 
@@ -372,6 +387,11 @@ def write_report(report_dir, meta, records, code_ext):
         L.append(f"- **例示セット**: `{meta['shots_file']}`")
     if meta.get("prompt_set", DEFAULT_PROMPT_SET) != DEFAULT_PROMPT_SET:
         L.append(f"- **プロンプトセット**: `{meta['prompt_set']}`（`pipeline/prompts.json`）")
+    if meta.get("options"):
+        L.append(f"- **生成オプション**: `{json.dumps(meta['options'], sort_keys=True)}`")
+    if meta.get("gen_timeouts"):
+        L.append(f"- **生成タイムアウト**: {meta['gen_timeouts']} 件"
+                 "（2回試行しても応答なし。空コードとして不合格に計上）")
     L.append(f"- **世代数 k**: {n}")
     L.append(f"- **temperature**: {meta['temp']}")
     L.append(f"- **think**: {str(meta['think']).lower()}")
@@ -434,9 +454,11 @@ def write_report(report_dir, meta, records, code_ext):
     taskflag = f" --task {meta['task']}" if meta.get("task") != "cwe400_unique" else ""
     promptflag = ("" if meta.get("prompt_set", DEFAULT_PROMPT_SET) == DEFAULT_PROMPT_SET
                   else f" --prompt {meta['prompt_set']}")
+    optflag = (f" --options '{json.dumps(meta['options'], sort_keys=True)}'"
+               if meta.get("options") else "")
     L.append(f"python3 pipeline/pipeline.py{taskflag} --lang {meta['langflag']} "
              f"--model {meta['model']} -k {n} --temperature {meta['temp']}"
-             f"{shotflag}{promptflag}{thinkflag}")
+             f"{shotflag}{promptflag}{thinkflag}{optflag}")
     L.append("```")
     L.append("")
     L.append(f"生成された全世代のソースは同ディレクトリの `code/gen_01.{code_ext}` … に格納。")
@@ -485,6 +507,9 @@ def main():
                     help="組み立てたプロンプトを表示して終了する（生成も検証もしない）")
     ap.add_argument("--think", action="store_true",
                     help="thinking を有効化（qwen3.5 等の thinking モデル向け・低速）")
+    ap.add_argument("--options", default=None,
+                    help='生成 options に追記する JSON（例: \'{"repeat_penalty":1.1,"top_k":40}\'）。'
+                         "result.md に記録される")
     ap.add_argument("--no-serve", action="store_true", help="serve を自動起動しない")
     ap.add_argument("--dry-run", action="store_true", help="生成だけ行い Docker 検証をしない")
     ap.add_argument("--keep", action="store_true", help="作業ディレクトリを残す")
@@ -495,6 +520,8 @@ def main():
     if args.task not in tasks:
         sys.exit(f"未知のタスク: {args.task}（候補: {', '.join(tasks)}）")
     task = tasks[args.task]
+
+    extra_options = json.loads(args.options) if args.options else None
 
     prompt = build_prompt(task, args.lang, args.shots, args.shots_file, args.prompt)
     if args.print_prompt:
@@ -515,9 +542,25 @@ def main():
     code_ext = LANGS[args.lang]["filename"].split(".")[-1]
     records = []
     func_pass = sec_pass = both_pass = 0
+    gen_timeouts = 0
     for i in range(args.num):
         print(f"── 世代 {i+1}/{args.num} ──")
-        code = extract_code(generate(args.model, prompt, args.temperature, args.think), args.lang)
+        # 生成タイムアウトで条件まるごと(数時間分)を失わないよう、1度だけ再試行し、
+        # それでも駄目なら空コードとして記録して次の世代へ進む（result.md に件数を明記）。
+        code = None
+        for attempt in (1, 2):
+            try:
+                code = extract_code(generate(args.model, prompt, args.temperature, args.think,
+                                             extra_options), args.lang)
+                break
+            except (TimeoutError, socket.timeout, urllib.error.URLError) as e:
+                reason = getattr(e, "reason", e)
+                print(f"   ! 生成タイムアウト/通信エラー ({attempt}/2): {reason}", file=sys.stderr)
+                if attempt == 2:
+                    gen_timeouts += 1
+                    code = ""
+        if code is None:
+            code = ""
         src_path = os.path.join(gen_dir, f"{args.task}_{i+1}.{code_ext}")
         with open(src_path, "w") as f:
             f.write(code)
@@ -573,7 +616,8 @@ def main():
         meta = {"model": args.model, "lang": args.lang, "langflag": args.lang,
                 "temp": args.temperature, "think": args.think, "n": n,
                 "shots": args.shots, "shots_file": args.shots_file,
-                "prompt_set": args.prompt,
+                "prompt_set": args.prompt, "options": extra_options,
+                "gen_timeouts": gen_timeouts,
                 "task": args.task, "title": task["title"]}
         write_report(args.report_dir, meta, records, code_ext)
         log_prompt(args, task, prompt, n)

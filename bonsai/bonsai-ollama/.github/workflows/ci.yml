@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+      - name: Vet
+        run: go vet ./...
+      - name: Build proxy
+        run: go build -o /tmp/bonsai-ollama-proxy ./cmd/bonsai-ollama-proxy
+      - name: Build tools
+        run: |
+          go build -o /tmp/bench-llama-tokens ./cmd/bench-llama-tokens
+          go build -o /tmp/verify-stream ./cmd/verify-stream
+          go build -o /tmp/publish-ollama-hub-readme ./cmd/publish-ollama-hub-readme

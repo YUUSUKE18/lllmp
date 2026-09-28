@@ -1,0 +1,16 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int valid = 0;
+        String line;
+        while ((line = br.readLine()) != null) {
+            line = line.trim();
+            if (line.isEmpty()) continue;
+            if (line.split(",").length >= 2) valid++;
+        }
+        System.out.println("valid=" + valid);
+    }
+}
