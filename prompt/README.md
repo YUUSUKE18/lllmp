@@ -47,15 +47,15 @@
 | [`cwe400_pair_sum_ts_fewshot3.md`](cwe400_pair_sum_ts_fewshot3.md) | `cwe400_pair_sum` | ts | few-shot(3)（セット `shots.json`） | 20 |
 | [`cwe400_pair_sum_ts_oneshot.md`](cwe400_pair_sum_ts_oneshot.md) | `cwe400_pair_sum` | ts | one-shot（セット `shots.json`） | 20 |
 | [`cwe400_pair_sum_ts_zeroshot.md`](cwe400_pair_sum_ts_zeroshot.md) | `cwe400_pair_sum` | ts | zero-shot | 24 |
-| [`cwe400_unique_go_fewshot3.md`](cwe400_unique_go_fewshot3.md) | `cwe400_unique` | go | few-shot(3)（セット `shots.json`） | 8 |
-| [`cwe400_unique_go_oneshot.md`](cwe400_unique_go_oneshot.md) | `cwe400_unique` | go | one-shot（セット `shots.json`） | 8 |
-| [`cwe400_unique_go_zeroshot.md`](cwe400_unique_go_zeroshot.md) | `cwe400_unique` | go | zero-shot | 10 |
-| [`cwe400_unique_java_fewshot3.md`](cwe400_unique_java_fewshot3.md) | `cwe400_unique` | java | few-shot(3)（セット `shots.json`） | 8 |
-| [`cwe400_unique_java_oneshot.md`](cwe400_unique_java_oneshot.md) | `cwe400_unique` | java | one-shot（セット `shots.json`） | 8 |
-| [`cwe400_unique_java_zeroshot.md`](cwe400_unique_java_zeroshot.md) | `cwe400_unique` | java | zero-shot | 10 |
-| [`cwe400_unique_ts_fewshot3.md`](cwe400_unique_ts_fewshot3.md) | `cwe400_unique` | ts | few-shot(3)（セット `shots.json`） | 8 |
-| [`cwe400_unique_ts_oneshot.md`](cwe400_unique_ts_oneshot.md) | `cwe400_unique` | ts | one-shot（セット `shots.json`） | 8 |
-| [`cwe400_unique_ts_zeroshot.md`](cwe400_unique_ts_zeroshot.md) | `cwe400_unique` | ts | zero-shot | 10 |
+| [`cwe400_unique_go_fewshot3.md`](cwe400_unique_go_fewshot3.md) | `cwe400_unique` | go | few-shot(3)（セット `shots.json`） | 12 |
+| [`cwe400_unique_go_oneshot.md`](cwe400_unique_go_oneshot.md) | `cwe400_unique` | go | one-shot（セット `shots.json`） | 12 |
+| [`cwe400_unique_go_zeroshot.md`](cwe400_unique_go_zeroshot.md) | `cwe400_unique` | go | zero-shot | 14 |
+| [`cwe400_unique_java_fewshot3.md`](cwe400_unique_java_fewshot3.md) | `cwe400_unique` | java | few-shot(3)（セット `shots.json`） | 12 |
+| [`cwe400_unique_java_oneshot.md`](cwe400_unique_java_oneshot.md) | `cwe400_unique` | java | one-shot（セット `shots.json`） | 12 |
+| [`cwe400_unique_java_zeroshot.md`](cwe400_unique_java_zeroshot.md) | `cwe400_unique` | java | zero-shot | 14 |
+| [`cwe400_unique_ts_fewshot3.md`](cwe400_unique_ts_fewshot3.md) | `cwe400_unique` | ts | few-shot(3)（セット `shots.json`） | 12 |
+| [`cwe400_unique_ts_oneshot.md`](cwe400_unique_ts_oneshot.md) | `cwe400_unique` | ts | one-shot（セット `shots.json`） | 12 |
+| [`cwe400_unique_ts_zeroshot.md`](cwe400_unique_ts_zeroshot.md) | `cwe400_unique` | ts | zero-shot | 14 |
 | [`cwe401_memo_retain_go_fewshot3.md`](cwe401_memo_retain_go_fewshot3.md) | `cwe401_memo_retain` | go | few-shot(3)（セット `shots.json`） | 20 |
 | [`cwe401_memo_retain_go_oneshot.md`](cwe401_memo_retain_go_oneshot.md) | `cwe401_memo_retain` | go | one-shot（セット `shots.json`） | 20 |
 | [`cwe401_memo_retain_go_zeroshot.md`](cwe401_memo_retain_go_zeroshot.md) | `cwe401_memo_retain` | go | zero-shot | 24 |
@@ -114,4 +114,4 @@
 | [`cwe835_declared_count_ts_oneshot.md`](cwe835_declared_count_ts_oneshot.md) | `cwe835_declared_count` | ts | one-shot（セット `shots.json`） | 12 |
 | [`cwe835_declared_count_ts_zeroshot.md`](cwe835_declared_count_ts_zeroshot.md) | `cwe835_declared_count` | ts | zero-shot | 14 |
 
-- プロンプト 102 種 / 検証 1229 条件。
+- プロンプト 102 種 / 検証 1265 条件。
