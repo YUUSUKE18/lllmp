@@ -1,0 +1,22 @@
+const data: Buffer[] = [];
+process.stdin.on("data", (c: Buffer) => data.push(c));
+process.stdin.on("end", () => {
+  const s = Buffer.concat(data).toString("utf8");
+  const items = s.split(/,/);
+  let seen = new Set<number>();
+  let count = 0;
+  let sum = 0;
+  for (const item of items) {
+    const trimmed = item.trim();
+    if (!trimmed) continue;
+    const num = parseInt(trimmed, 10);
+    if (!isNaN(num)) {
+      if (!seen.has(num)) {
+        seen.add(num);
+        count++;
+        sum += num;
+      }
+    }
+  }
+  console.log(`count=${count} sum=${sum}`);
+});
